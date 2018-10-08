@@ -1,5 +1,6 @@
 var ws = null;
 var sendMes = [0, 0];
+var url = "";
 
 var ctl_hight = 300;
 var title_hight = 50;
@@ -24,7 +25,8 @@ var IndexRight = -1;
 
 // 初期化...
 window.addEventListener('load', function() {
-    ws = new WebSocket("ws://192.168.0.116:8080/pipe");
+    url = "ws://" + location.hostname + ":8080/pipe";
+    ws = new WebSocket(url);
 
     // 左操作用Canvasの準備
     _canvas_left = document.getElementById('canvas-area-left');
@@ -154,7 +156,8 @@ function touchmove_right(e) {
 // タイマーの処理。50ミリ秒ごとに画像を更新
 setInterval(function(){
     // 画像のオブジェクトを取得
-    var s = sLeft + sRight;
+    var s = "url=" + url + "<br>"
+    s += sLeft + sRight;
     s += "touchIdLeft = " + touchIdLeft + ", touchFlagLeft = " + touchFlagLeft + ", touchIdLeftTmp =" + touchIdLeftTmp + ", IndexLeft = " + IndexLeft + ", motorPowerLeft = " + motorPowerLeft + "<br>";
     s += "touchIdRight = " + touchIdRight + ", touchFlagRitht = " + touchFlagRight + ", touchIdRightTmp =" + touchIdRightTmp + ", IndexRight = " + IndexRight + ", motorPowerRight = " + motorPowerRight + "<br>";
     document.getElementById("disp").innerHTML = s;  // 生成した文字列を画面に表示
