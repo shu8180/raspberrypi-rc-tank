@@ -1,0 +1,9 @@
+[Unit]
+Description=TankController
+
+[Service]
+WorkingDirectory=/home/pi/raspberrypi-rc-tank
+ExecStart=/usr/bin/python /home/pi/raspberrypi-rc-tank/server.py
+
+[Install]
+WantedBy = multi-user.target
