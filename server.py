@@ -17,9 +17,11 @@ app = Flask(__name__)
 #IO Pin for Left motor driver
 IO_PIN_M1_1 = 15
 IO_PIN_M1_2 = 16
+IO_PIN_M1_PWM = 18
 #IO Pin for Right motor driver
 IO_PIN_M2_1 = 11
 IO_PIN_M2_2 = 12
+IO_PIN_M2_PWM = 13
 
 PWM_FREQUENCY_HZ = 100
 
@@ -30,21 +32,25 @@ GPIO.setmode(GPIO.BOARD) # Using PIN numbers.
 # Configuring Left motor
 GPIO.setup(IO_PIN_M1_1, GPIO.OUT)
 GPIO.setup(IO_PIN_M1_2, GPIO.OUT)
-pwmLF = GPIO.PWM(IO_PIN_M1_1, PWM_FREQUENCY_HZ)
-pwmLF.start(0)
-pwmLR = GPIO.PWM(IO_PIN_M1_2, PWM_FREQUENCY_HZ)
-pwmLR.start(0)
+GPIO.setup(IO_PIN_M1_PWM, GPIO.OUT)
+GPIO.output(IO_PIN_M1_1, GPIO.LOW)
+GPIO.output(IO_PIN_M1_2, GPIO.LOW)
+pwmL = GPIO.PWM(IO_PIN_M1_PWM, PWM_FREQUENCY_HZ)
+pwmL.start(0)
 
 # Configuring Right motor
 GPIO.setup(IO_PIN_M2_1, GPIO.OUT)
 GPIO.setup(IO_PIN_M2_2, GPIO.OUT)
-pwmRF = GPIO.PWM(IO_PIN_M2_1, PWM_FREQUENCY_HZ)
-pwmRF.start(0)
-pwmRR = GPIO.PWM(IO_PIN_M2_2, PWM_FREQUENCY_HZ)
-pwmRR.start(0)
+GPIO.setup(IO_PIN_M2_PWM, GPIO.OUT)
+GPIO.output(IO_PIN_M2_1, GPIO.LOW)
+GPIO.output(IO_PIN_M2_2, GPIO.LOW)
+pwmR = GPIO.PWM(IO_PIN_M2_PWM, PWM_FREQUENCY_HZ)
+pwmR.start(0)
+
 
 @app.route('/')
 def index():
+    logger.debug('Get request index')
     return render_template('index.html')
 
 
@@ -61,20 +67,24 @@ def pipe():
             motorRightData = int(motorDataStr[1])
 
             if (motorLeftData >= 0):
-                pwmLF.ChangeDutyCycle(motorLeftData)
-                pwmLR.ChangeDutyCycle(0)
+                GPIO.output(IO_PIN_M1_1, GPIO.HIGH)
+                GPIO.output(IO_PIN_M1_2, GPIO.LOW)
+                pwmL.ChangeDutyCycle(motorLeftData)
             else:
                 pwmData = motorLeftData * (-1)
-                pwmLF.ChangeDutyCycle(0)
-                pwmLR.ChangeDutyCycle(pwmData)
+                GPIO.output(IO_PIN_M1_1, GPIO.LOW)
+                GPIO.output(IO_PIN_M1_2, GPIO.HIGH)
+                pwmL.ChangeDutyCycle(pwmData)
 
             if (motorRightData >= 0):
-                pwmRF.ChangeDutyCycle(motorRightData)
-                pwmRR.ChangeDutyCycle(0)
+                GPIO.output(IO_PIN_M2_1, GPIO.HIGH)
+                GPIO.output(IO_PIN_M2_2, GPIO.LOW)
+                pwmR.ChangeDutyCycle(motorRightData)
             else:
                 pwmData = motorRightData * (-1)
-                pwmRF.ChangeDutyCycle(0)
-                pwmRR.ChangeDutyCycle(pwmData)
+                GPIO.output(IO_PIN_M2_1, GPIO.LOW)
+                GPIO.output(IO_PIN_M2_2, GPIO.HIGH)
+                pwmR.ChangeDutyCycle(pwmData)
 
             #ws.send(message)
 
